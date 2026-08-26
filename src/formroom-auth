@@ -1,0 +1,138 @@
+// ============================================================
+// Formroom Authentication — Firebase (Google + Email Link)
+// ============================================================
+// WHY THIS FILE IS SEPARATE:
+// The Claude preview environment can't install npm packages like
+// "firebase", so this code can't run inside that live preview.
+// Save this file and drop it into a real project (e.g. one created
+// with Vite or Create React App) once Formroom is hosted for real.
+//
+// SETUP (one-time, in your real project):
+//   1. npm install firebase
+//   2. Put this file at src/formroom-auth.js
+//   3. In the Firebase console, once your real site has a domain,
+//      go to Authentication > Settings > Authorized domains and
+//      add that domain (Google sign-in will fail otherwise).
+// ============================================================
+
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+
+// Your project's config — safe to keep here, these values identify
+// the project publicly and aren't secret credentials.
+const firebaseConfig = {
+  apiKey: "AIzaSyBsTiBHmgZiyTGGuU6i3kCZM2ObOax4dms",
+  authDomain: "formroom-fcb53.firebaseapp.com",
+  projectId: "formroom-fcb53",
+  storageBucket: "formroom-fcb53.firebasestorage.app",
+  messagingSenderId: "385688643718",
+  appId: "1:385688643718:web:91b1b23250c8d6bfc38907",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ---------- Google sign-in ----------
+// Opens a Google popup. Resolves with the signed-in user, or throws
+// on failure (e.g. the user closes the popup).
+export async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(auth, provider);
+  return result.user; // { uid, email, displayName, photoURL, ... }
+}
+
+// ---------- Email link ("send me a verification link") sign-in ----------
+// Step 1: call this with the user's email. Firebase sends them a
+// real email containing a special sign-in link.
+export async function sendLoginLink(email) {
+  const actionCodeSettings = {
+    // Must be a real, hosted URL once deployed — replace with your
+    // actual domain, e.g. "https://formroom.com/finish-signin"
+    url: window.location.href,
+    handleCodeInApp: true,
+  };
+  await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+  // Firebase can't resend the same email to the same address on
+  // this device without knowing it — save it locally so step 2
+  // can find it again when the user clicks the link.
+  window.localStorage.setItem("formroomEmailForSignIn", email);
+}
+
+// Step 2: call this when the app loads. It checks whether the
+// current page URL is a sign-in link the user just clicked, and if
+// so, completes the sign-in automatically.
+export async function completeLoginIfEmailLink() {
+  if (!isSignInWithEmailLink(auth, window.location.href)) return null;
+
+  let email = window.localStorage.getItem("formroomEmailForSignIn");
+  if (!email) {
+    // Fallback: if they opened the link on a different device,
+    // ask them to confirm their email instead of guessing.
+    email = window.prompt("Please confirm your email to finish signing in:");
+  }
+  const result = await signInWithEmailLink(auth, email, window.location.href);
+  window.localStorage.removeItem("formroomEmailForSignIn");
+  return result.user;
+}
+
+// ---------- Staying signed in / signing out ----------
+// Call this once when your app starts. It fires immediately with
+// the current user (or null), and again whenever sign-in state
+// changes — this is how a React component knows who's logged in.
+export function watchAuthState(callback) {
+  return onAuthStateChanged(auth, (user) => callback(user));
+}
+
+export async function signOutUser() {
+  await signOut(auth);
+}
+
+// ============================================================
+// Example usage inside a React component:
+//
+//   import { useEffect, useState } from "react";
+//   import {
+//     signInWithGoogle,
+//     sendLoginLink,
+//     completeLoginIfEmailLink,
+//     watchAuthState,
+//     signOutUser,
+//   } from "./formroom-auth";
+//
+//   function App() {
+//     const [user, setUser] = useState(null);
+//
+//     useEffect(() => {
+//       completeLoginIfEmailLink(); // handles clicked email links
+//       const unsubscribe = watchAuthState(setUser);
+//       return unsubscribe;
+//     }, []);
+//
+//     if (!user) {
+//       return (
+//         <div>
+//           <button onClick={signInWithGoogle}>Continue with Google</button>
+//           <button onClick={() => sendLoginLink("student@email.com")}>
+//             Email me a sign-in link
+//           </button>
+//         </div>
+//       );
+//     }
+//
+//     return (
+//       <div>
+//         Welcome, {user.displayName || user.email}!
+//         <button onClick={signOutUser}>Sign out</button>
+//       </div>
+//     );
+//   }
+// ============================================================
