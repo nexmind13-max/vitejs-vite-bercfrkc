@@ -2694,7 +2694,7 @@ export default function App() {
             />
           )}
           {view === 'lesson' && subject && chapter && (
-            <LessonViewss
+            <LessonView
               subject={subject}
               chapter={chapter}
               savedResult={progress[chapter.id]}
