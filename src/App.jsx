@@ -2043,16 +2043,23 @@ function LandingView({ onEnter }) {
   );
 }
 
-function HomeView({ onSelectSubject, progress }) {
+function HomeView({ onSelectSubject, progress, onBackToLanding }) {
   return (
     <div>
       <section
         className="px-6 md:px-10 pt-16 pb-20"
         style={{ backgroundColor: COLORS.green }}
       >
+        <button
+          onClick={onBackToLanding}
+          className="fr-fade-up inline-flex items-center gap-2 text-sm mb-8"
+          style={{ color: COLORS.slate }}
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
         <h1
           className="fr-fade-up max-w-2xl text-4xl md:text-6xl font-extrabold leading-[1.05]"
-          style={{ color: COLORS.ink, fontFamily: "'Space Grotesk', sans-serif" }}
+          style={{ color: COLORS.ink, fontFamily: "'Space Grotesk', sans-serif", animationDelay: "0.05s" }}
         >
           Pick a subject.
           <br />
@@ -2060,7 +2067,7 @@ function HomeView({ onSelectSubject, progress }) {
         </h1>
         <p
           className="fr-fade-up max-w-md mt-5 text-base md:text-lg"
-          style={{ color: COLORS.slate, animationDelay: "0.1s" }}
+          style={{ color: COLORS.slate, animationDelay: "0.15s" }}
         >
           Eight core subjects, short lessons, and a quiz at the end of each one
           — so you know it stuck before you move on.
@@ -2395,6 +2402,7 @@ export default function App() {
                 setSubject(s);
                 setView("subject");
               }}
+              onBackToLanding={() => setView("landing")}
             />
           )}
           {view === "subject" && subject && (
