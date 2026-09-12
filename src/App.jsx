@@ -29,22 +29,77 @@ import {
 
 const FONTS = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.fr-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.fr-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+.fr-pop-in {
+  opacity: 0;
+  animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.fr-stagger > * {
+  opacity: 0;
+  animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.fr-stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.fr-stagger > *:nth-child(2) { animation-delay: 0.09s; }
+.fr-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.fr-stagger > *:nth-child(4) { animation-delay: 0.21s; }
+.fr-stagger > *:nth-child(5) { animation-delay: 0.27s; }
+.fr-stagger > *:nth-child(6) { animation-delay: 0.33s; }
+.fr-stagger > *:nth-child(7) { animation-delay: 0.39s; }
+.fr-stagger > *:nth-child(8) { animation-delay: 0.45s; }
+
+.fr-card-hover {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+.fr-card-hover:hover {
+  transform: translateY(-4px);
+}
+.fr-btn {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.15s ease;
+}
+.fr-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.fr-btn:active:not(:disabled) {
+  transform: translateY(0px) scale(0.98);
+}
 `;
 
 const COLORS = {
-  ink: "#1B2A4A",
-  paper: "#FAF7F0",
-  paperDark: "#EFEAE0",
-  slate: "#6B7280",
-  green: "#1F4738",
-  yellow: "#F2C94C",
+  ink: "#F4F6FB",       // primary text — near-white
+  paper: "#0B0E1A",     // page background — deep navy-black
+  paperDark: "#151A2C", // card/surface background
+  slate: "#94A0C2",     // secondary text
+  green: "#141827",     // header/hero band background
+  yellow: "#7C5CFF",    // primary accent — bright violet
+  border: "#242B45",    // subtle borders/dividers
 };
 
 const SUBJECTS = [
   {
     id: "maths",
     name: "Mathematics",
-    color: "#3B6FD1",
+    color: "#5B8DEF",
     icon: Calculator,
     tagline: "Numbers, patterns, proof.",
     chapters: [
@@ -248,7 +303,7 @@ const SUBJECTS = [
   {
     id: "english",
     name: "English Language",
-    color: "#B5473A",
+    color: "#FF6B5B",
     icon: BookOpen,
     tagline: "Say exactly what you mean.",
     chapters: [
@@ -459,7 +514,7 @@ const SUBJECTS = [
   {
     id: "chemistry",
     name: "Chemistry",
-    color: "#7B5EA7",
+    color: "#B98AFF",
     icon: FlaskConical,
     tagline: "What everything is made of.",
     chapters: [
@@ -671,7 +726,7 @@ const SUBJECTS = [
   {
     id: "physics",
     name: "Physics",
-    color: "#2E9C8F",
+    color: "#3DDBC0",
     icon: Atom,
     tagline: "How things move and why.",
     chapters: [
@@ -868,7 +923,7 @@ const SUBJECTS = [
   {
     id: "art",
     name: "Art",
-    color: "#E08A2E",
+    color: "#FFA94D",
     icon: Palette,
     tagline: "Seeing, then making.",
     chapters: [
@@ -1076,7 +1131,7 @@ const SUBJECTS = [
   {
     id: "government",
     name: "Government",
-    color: "#3E7C4A",
+    color: "#5FD97A",
     icon: Landmark,
     tagline: "How power is organized.",
     chapters: [
@@ -1289,7 +1344,7 @@ const SUBJECTS = [
   {
     id: "crs",
     name: "CRS",
-    color: "#C9A54A",
+    color: "#FFD166",
     icon: BookMarked,
     tagline: "Christian Religious Studies.",
     chapters: [
@@ -1483,7 +1538,7 @@ const SUBJECTS = [
   {
     id: "biology",
     name: "Biology",
-    color: "#C1548C",
+    color: "#FF7AC6",
     icon: Microscope,
     tagline: "The study of living things.",
     chapters: [
@@ -1665,11 +1720,13 @@ function SpineCard({ subject, onClick, doneCount }) {
   return (
     <button
       onClick={onClick}
-      className="group relative text-left rounded-lg overflow-hidden transition-transform duration-200 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="fr-card-hover group relative text-left rounded-lg overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         backgroundColor: subject.color,
-        boxShadow: "0 1px 0 rgba(0,0,0,0.15), 0 8px 16px -8px rgba(0,0,0,0.35)",
+        boxShadow: `0 1px 0 rgba(0,0,0,0.25), 0 10px 28px -10px ${subject.color}66`,
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 1px 0 rgba(0,0,0,0.25), 0 16px 32px -8px ${subject.color}99`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = `0 1px 0 rgba(0,0,0,0.25), 0 10px 28px -10px ${subject.color}66`; }}
     >
       <div className="p-5 h-40 flex flex-col justify-between">
         <div className="flex items-center justify-between">
@@ -1693,7 +1750,7 @@ function SpineCard({ subject, onClick, doneCount }) {
             className="inline-block px-2 py-1 -rotate-2 text-base leading-none rounded-sm"
             style={{
               backgroundColor: "rgba(255,255,255,0.92)",
-              color: COLORS.ink,
+              color: COLORS.paper,
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
@@ -1712,27 +1769,27 @@ function Header({ onHome, onSignIn, user, onSignOut }) {
   return (
     <header
       className="sticky top-0 z-10 flex items-center justify-between px-6 md:px-10 py-4"
-      style={{ backgroundColor: COLORS.green }}
+      style={{ backgroundColor: COLORS.green, borderBottom: `1px solid ${COLORS.border}` }}
     >
       <button
         onClick={onHome}
         className="text-xl md:text-2xl font-extrabold tracking-tight"
-        style={{ color: COLORS.paper, fontFamily: "'Space Grotesk', sans-serif" }}
+        style={{ color: COLORS.ink, fontFamily: "'Space Grotesk', sans-serif" }}
       >
         Formroom
       </button>
       <div className="flex items-center gap-4">
         <span
           className="text-xs uppercase tracking-widest hidden sm:block"
-          style={{ color: "rgba(250,247,240,0.6)", fontFamily: "'JetBrains Mono', monospace" }}
+          style={{ color: COLORS.slate, fontFamily: "'JetBrains Mono', monospace" }}
         >
           8 subjects · lessons + quizzes
         </span>
         {user ? (
           <button
             onClick={onSignOut}
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
-            style={{ backgroundColor: "rgba(255,255,255,0.14)", color: COLORS.paper }}
+            className="fr-btn flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+            style={{ backgroundColor: "rgba(124,92,255,0.16)", color: COLORS.ink }}
             title="Click to sign out"
           >
             <User size={13} /> {user.displayName || user.email}
@@ -1740,8 +1797,8 @@ function Header({ onHome, onSignIn, user, onSignOut }) {
         ) : (
           <button
             onClick={onSignIn}
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
-            style={{ backgroundColor: "rgba(255,255,255,0.14)", color: COLORS.paper }}
+            className="fr-btn flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+            style={{ backgroundColor: "rgba(124,92,255,0.16)", color: COLORS.ink }}
           >
             <User size={13} /> Sign in
           </button>
@@ -1782,12 +1839,12 @@ function SignInModal({ onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-20 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(27,42,74,0.55)" }}
+      className="fr-fade-in fixed inset-0 z-20 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.65)" }}
     >
       <div
-        className="w-full max-w-sm rounded-lg p-6"
-        style={{ backgroundColor: COLORS.paper }}
+        className="fr-pop-in w-full max-w-sm rounded-lg p-6"
+        style={{ backgroundColor: COLORS.paperDark, border: `1px solid ${COLORS.border}` }}
       >
         <div className="flex items-center justify-between mb-5">
           <h2
@@ -1811,8 +1868,8 @@ function SignInModal({ onClose }) {
             <button
               onClick={handleGoogle}
               disabled={status === "sending"}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium mb-3 disabled:opacity-60"
-              style={{ backgroundColor: "#fff", color: COLORS.ink, border: `1px solid ${COLORS.paperDark}` }}
+              className="fr-btn w-full flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium mb-3 disabled:opacity-60"
+              style={{ backgroundColor: "#fff", color: "#1F2430", border: `1px solid ${COLORS.border}` }}
             >
               <svg width="16" height="16" viewBox="0 0 48 48">
                 <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.5 29.5 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.9-3.5z"/>
@@ -1824,12 +1881,12 @@ function SignInModal({ onClose }) {
             </button>
 
             <div className="flex items-center gap-3 my-4">
-              <div className="flex-1 h-px" style={{ backgroundColor: COLORS.paperDark }} />
+              <div className="flex-1 h-px" style={{ backgroundColor: COLORS.border }} />
               <span className="text-xs" style={{ color: COLORS.slate }}>or</span>
-              <div className="flex-1 h-px" style={{ backgroundColor: COLORS.paperDark }} />
+              <div className="flex-1 h-px" style={{ backgroundColor: COLORS.border }} />
             </div>
 
-            <div className="flex items-center gap-2 mb-3 px-3 py-2.5 rounded-md" style={{ backgroundColor: COLORS.paperDark }}>
+            <div className="flex items-center gap-2 mb-3 px-3 py-2.5 rounded-md" style={{ backgroundColor: COLORS.paper, border: `1px solid ${COLORS.border}` }}>
               <Mail size={16} color={COLORS.slate} />
               <input
                 type="email"
@@ -1843,14 +1900,14 @@ function SignInModal({ onClose }) {
             <button
               onClick={handleEmailLink}
               disabled={!email || status === "sending"}
-              className="w-full py-2.5 rounded-md text-sm font-semibold disabled:opacity-40"
-              style={{ backgroundColor: COLORS.green, color: COLORS.paper }}
+              className="fr-btn w-full py-2.5 rounded-md text-sm font-semibold disabled:opacity-40"
+              style={{ backgroundColor: COLORS.yellow, color: "#fff" }}
             >
               {status === "sending" ? "Sending…" : "Email me a sign-in link"}
             </button>
 
             {status === "error" && (
-              <p className="text-xs mt-3" style={{ color: "#B5473A" }}>
+              <p className="text-xs mt-3" style={{ color: "#FF6B5B" }}>
                 {errorMsg}
               </p>
             )}
@@ -1875,30 +1932,30 @@ function LandingView({ onEnter }) {
         style={{ backgroundColor: COLORS.green }}
       >
         <span
-          className="text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-6"
-          style={{ backgroundColor: "rgba(255,255,255,0.14)", color: COLORS.yellow, fontFamily: "'JetBrains Mono', monospace" }}
+          className="fr-fade-up text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-6"
+          style={{ backgroundColor: "rgba(124,92,255,0.15)", color: COLORS.yellow, fontFamily: "'JetBrains Mono', monospace" }}
         >
           Free · No account needed
         </span>
         <h1
-          className="max-w-2xl text-4xl md:text-6xl font-extrabold leading-[1.05]"
-          style={{ color: COLORS.paper, fontFamily: "'Space Grotesk', sans-serif" }}
+          className="fr-fade-up max-w-2xl text-4xl md:text-6xl font-extrabold leading-[1.05]"
+          style={{ color: COLORS.ink, fontFamily: "'Space Grotesk', sans-serif", animationDelay: "0.08s" }}
         >
           A quiet corner of the internet, just for studying.
         </h1>
-        <p className="max-w-xl mt-6 text-base md:text-lg" style={{ color: "rgba(250,247,240,0.8)" }}>
+        <p className="fr-fade-up max-w-xl mt-6 text-base md:text-lg" style={{ color: COLORS.slate, animationDelay: "0.16s" }}>
           Formroom is a free study site for secondary school students. Pick a
           subject, read a short lesson, then take a quick quiz to check it
           actually stuck — before you move on to the next one.
         </p>
         <button
           onClick={onEnter}
-          className="mt-9 px-7 py-3.5 rounded-md text-sm font-semibold"
-          style={{ backgroundColor: COLORS.yellow, color: COLORS.ink }}
+          className="fr-fade-up fr-btn mt-9 px-7 py-3.5 rounded-md text-sm font-semibold"
+          style={{ backgroundColor: COLORS.yellow, color: "#fff", animationDelay: "0.24s" }}
         >
           Enter Formroom →
         </button>
-        <div className="flex flex-wrap gap-x-8 gap-y-2 mt-10 text-sm" style={{ color: "rgba(250,247,240,0.65)" }}>
+        <div className="fr-fade-up flex flex-wrap gap-x-8 gap-y-2 mt-10 text-sm" style={{ color: COLORS.slate, animationDelay: "0.32s" }}>
           <span>{SUBJECTS.length} subjects</span>
           <span>{totalChapters} lessons</span>
           <span>{totalQuestions} quiz questions</span>
@@ -1912,7 +1969,7 @@ function LandingView({ onEnter }) {
         >
           How it works
         </h2>
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="fr-stagger grid sm:grid-cols-3 gap-6">
           {[
             {
               icon: Target,
@@ -1932,8 +1989,8 @@ function LandingView({ onEnter }) {
           ].map((step) => {
             const Icon = step.icon;
             return (
-              <div key={step.title} className="p-5 rounded-lg" style={{ backgroundColor: COLORS.paperDark }}>
-                <Icon size={20} color={COLORS.green} />
+              <div key={step.title} className="fr-card-hover p-5 rounded-lg" style={{ backgroundColor: COLORS.paperDark, border: `1px solid ${COLORS.border}` }}>
+                <Icon size={20} color={COLORS.yellow} />
                 <h3 className="font-semibold mt-3" style={{ color: COLORS.ink }}>
                   {step.title}
                 </h3>
@@ -1962,9 +2019,9 @@ function LandingView({ onEnter }) {
         </p>
         <div
           className="mt-6 max-w-2xl flex items-start gap-3 p-4 rounded-lg"
-          style={{ backgroundColor: COLORS.paperDark }}
+          style={{ backgroundColor: COLORS.paperDark, border: `1px solid ${COLORS.border}` }}
         >
-          <Save size={18} color={COLORS.green} className="mt-0.5 shrink-0" />
+          <Save size={18} color={COLORS.yellow} className="mt-0.5 shrink-0" />
           <p className="text-sm" style={{ color: COLORS.slate }}>
             Formroom is new, so we don't have long-term results to show yet —
             but your own progress is saved automatically as you go, so you can
@@ -1976,8 +2033,8 @@ function LandingView({ onEnter }) {
       <section className="px-6 md:px-10 pb-20">
         <button
           onClick={onEnter}
-          className="px-7 py-3.5 rounded-md text-sm font-semibold"
-          style={{ backgroundColor: COLORS.green, color: COLORS.paper }}
+          className="fr-btn px-7 py-3.5 rounded-md text-sm font-semibold"
+          style={{ backgroundColor: COLORS.yellow, color: "#fff" }}
         >
           Enter Formroom →
         </button>
@@ -1994,16 +2051,16 @@ function HomeView({ onSelectSubject, progress }) {
         style={{ backgroundColor: COLORS.green }}
       >
         <h1
-          className="max-w-2xl text-4xl md:text-6xl font-extrabold leading-[1.05]"
-          style={{ color: COLORS.paper, fontFamily: "'Space Grotesk', sans-serif" }}
+          className="fr-fade-up max-w-2xl text-4xl md:text-6xl font-extrabold leading-[1.05]"
+          style={{ color: COLORS.ink, fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Pick a subject.
           <br />
           Let's start a lesson.
         </h1>
         <p
-          className="max-w-md mt-5 text-base md:text-lg"
-          style={{ color: "rgba(250,247,240,0.75)" }}
+          className="fr-fade-up max-w-md mt-5 text-base md:text-lg"
+          style={{ color: COLORS.slate, animationDelay: "0.1s" }}
         >
           Eight core subjects, short lessons, and a quiz at the end of each one
           — so you know it stuck before you move on.
@@ -2011,7 +2068,7 @@ function HomeView({ onSelectSubject, progress }) {
       </section>
 
       <section className="px-6 md:px-10 -mt-10 pb-16">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl">
+        <div className="fr-stagger grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl">
           {SUBJECTS.map((s) => {
             const doneCount = s.chapters.filter((ch) => progress[ch.id]).length;
             return (
@@ -2070,15 +2127,15 @@ function SubjectView({ subject, onBack, onSelectLesson, progress }) {
           {subject.chapters.filter((ch) => progress[ch.id]).length} of{" "}
           {subject.chapters.length} chapters completed
         </p>
-        <div className="flex flex-col gap-3">
+        <div className="fr-stagger flex flex-col gap-3">
           {subject.chapters.map((ch, i) => {
             const done = progress[ch.id];
             return (
               <button
                 key={ch.id}
                 onClick={() => onSelectLesson(ch)}
-                className="text-left rounded-lg p-5 flex items-center justify-between gap-4 transition-colors"
-                style={{ backgroundColor: COLORS.paperDark }}
+                className="fr-card-hover text-left rounded-lg p-5 flex items-center justify-between gap-4"
+                style={{ backgroundColor: COLORS.paperDark, border: `1px solid ${COLORS.border}` }}
               >
                 <div>
                   <h3 className="font-semibold flex items-center gap-2" style={{ color: COLORS.ink }}>
@@ -2149,7 +2206,7 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
       </section>
 
       <section className="px-6 md:px-10 py-10 max-w-2xl">
-        <div className="flex flex-col gap-4">
+        <div className="fr-stagger flex flex-col gap-4">
           {chapter.content.split("\n\n").map((para, i) => (
             <p key={i} className="leading-relaxed" style={{ color: COLORS.ink }}>
               {para}
@@ -2158,7 +2215,7 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
         </div>
 
         {chapter.examples && chapter.examples.length > 0 && (
-          <div className="mt-6">
+          <div className="fr-fade-up mt-6">
             <h3
               className="text-sm font-semibold uppercase tracking-wide mb-3"
               style={{ color: subject.color, fontFamily: "'JetBrains Mono', monospace" }}
@@ -2167,7 +2224,7 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
             </h3>
             <div className="flex flex-col gap-3">
               {chapter.examples.map((ex, i) => (
-                <div key={i} className="p-4 rounded-md text-sm leading-relaxed" style={{ backgroundColor: COLORS.paperDark, color: COLORS.ink }}>
+                <div key={i} className="p-4 rounded-md text-sm leading-relaxed" style={{ backgroundColor: COLORS.paperDark, color: COLORS.ink, border: `1px solid ${COLORS.border}` }}>
                   {ex}
                 </div>
               ))}
@@ -2176,7 +2233,7 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
         )}
 
         {chapter.reference && (
-          <div className="mt-6 flex items-start gap-2">
+          <div className="fr-fade-up mt-6 flex items-start gap-2">
             <BookMarked size={16} color={subject.color} className="mt-0.5 shrink-0" />
             <p className="text-sm italic" style={{ color: COLORS.slate }}>
               Scripture reference: {chapter.reference}
@@ -2192,7 +2249,7 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
             Quick check
           </h2>
 
-          <div className="flex flex-col gap-8">
+          <div className="fr-stagger flex flex-col gap-8">
             {chapter.quiz.map((item, qi) => (
               <div key={qi}>
                 <p className="font-medium mb-3" style={{ color: COLORS.ink }}>
@@ -2202,28 +2259,27 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
                   {item.options.map((opt, oi) => {
                     const isSelected = answers[qi] === oi;
                     const isCorrect = oi === item.correct;
-                    let bg = COLORS.paperDark;
                     let border = "transparent";
-                    if (submitted && isSelected && isCorrect) border = "#2E9C8F";
-                    if (submitted && isSelected && !isCorrect) border = "#B5473A";
-                    if (submitted && !isSelected && isCorrect) border = "#2E9C8F";
+                    if (submitted && isSelected && isCorrect) border = "#3DDBC0";
+                    if (submitted && isSelected && !isCorrect) border = "#FF6B5B";
+                    if (submitted && !isSelected && isCorrect) border = "#3DDBC0";
                     return (
                       <button
                         key={oi}
                         onClick={() => selectAnswer(qi, oi)}
-                        className="text-left px-4 py-3 rounded-md text-sm flex items-center justify-between border-2 transition-colors"
+                        className="fr-btn text-left px-4 py-3 rounded-md text-sm flex items-center justify-between border-2"
                         style={{
-                          backgroundColor: isSelected ? "#fff" : bg,
+                          backgroundColor: isSelected ? subject.color : COLORS.paperDark,
                           borderColor: border,
-                          color: COLORS.ink,
+                          color: isSelected ? "#fff" : COLORS.ink,
                         }}
                       >
                         <span>{opt}</span>
                         {submitted && isSelected && isCorrect && (
-                          <Check size={16} color="#2E9C8F" />
+                          <Check size={16} color="#fff" />
                         )}
                         {submitted && isSelected && !isCorrect && (
-                          <X size={16} color="#B5473A" />
+                          <X size={16} color="#fff" />
                         )}
                       </button>
                     );
@@ -2237,17 +2293,17 @@ function LessonView({ subject, chapter, onBack, savedResult, onComplete }) {
             <button
               onClick={checkAnswers}
               disabled={!allAnswered}
-              className="mt-8 px-6 py-3 rounded-md text-sm font-semibold disabled:opacity-40"
-              style={{ backgroundColor: COLORS.green, color: COLORS.paper }}
+              className="fr-btn mt-8 px-6 py-3 rounded-md text-sm font-semibold disabled:opacity-40"
+              style={{ backgroundColor: COLORS.yellow, color: "#fff" }}
             >
               Check answers
             </button>
           ) : (
             <div
-              className="mt-8 p-5 rounded-lg flex items-center gap-3"
-              style={{ backgroundColor: COLORS.paperDark }}
+              className="fr-pop-in mt-8 p-5 rounded-lg flex items-center gap-3"
+              style={{ backgroundColor: COLORS.paperDark, border: `1px solid ${COLORS.border}` }}
             >
-              <CircleCheck size={22} color={COLORS.green} />
+              <CircleCheck size={22} color="#3DDBC0" />
               <p style={{ color: COLORS.ink }}>
                 You got <strong>{score}</strong> out of{" "}
                 <strong>{chapter.quiz.length}</strong> right.{" "}
